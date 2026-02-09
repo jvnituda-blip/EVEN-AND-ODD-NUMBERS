@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ODD and EVEN Numbers Game</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background: #f4f7fb;
+}
+
+#gameArea {
+    margin-top: 20px;
+}
+
+.number {
+    display: inline-block;
+    margin: 10px;
+    padding: 20px;
+    font-size: 24px;
+    background: #fff;
+    border: 2px solid #333;
+    cursor: pointer;
+    width: 60px;
+}
+
+.number.selected {
+    background: #cce5ff;
+}
+
+#message {
+    font-size: 22px;
+    font-weight: bold;
+    margin: 10px;
+}
+
+#scoreboard {
+    font-size: 20px;
+    margin: 10px;
+}
+
+#raceTrack {
+    position: relative;
+    width: 900px;
+    height: 120px;
+    background-image: url(https://i.imgur.com/Wt5JPM3.jpeg);
+   background-size:20% 100%;
+}
+
+#nun {
+    position: absolute;
+    left: 0;
+    bottom: 10px;
+    height: 150px;
+}
+
+#church {
+    position: absolute;
+    right: 0;
+background-color:yellow;
+    bottom: 10px;
+    height: 90px;
+}
+
+button { background-color: yellow; }
+button:hover { background-color: pink; }
+</style>
+</head>
+
+<body style="background-color:purple;-webkit-text-stroke: 1px white;">
+
+<audio id="voice1" src="https://archive.org/download/gd_20260209/gd.mp3" hidden></audio>
+<audio id="voice2" src="https://archive.org/download/gd_20260209/wrong.MP3" hidden></audio>
+<audio id="voice3" src="https://archive.org/download/gd_20260209/celeb.mp3" hidden></audio>
+<audio id="voice4" src="https://archive.org/download/gd_20260209/defeat.mp3" hidden></audio>
+
+<div style="background-color:blue;color:white;font-size:50px;font-family:cooper;text-align:center;">
+<img src="https://i.imgur.com/KAqXSze.png" style="position:absolute; left:5px; top:5px;width:100px;"> Assumption College of Nabunturan
+</div>
+
+<h1 id="titleText" style="-webkit-text-stroke: 1px white;">Odd and Even Numbers</h1>
+
+<table>
+<tr>
+<td style="background-color:blue;font-weight:800;" height="350" rowspan="2">
+<br><br>
+<label>Time (seconds): </label><br>
+<input type="number" id="timeInput" value="30" style="-webkit-text-stroke:1px black"><br><br>
+<button onclick="startGame()" type="button" style="width:150px;border-radius:10%; color: blue; height:60px; font-size:50px;box-shadow:3px 3px black;">Start</button>
+
+<div id="scoreboard">
+    Time Left:<br><span id="time" style="color:red;font-size:30px;">0</span><br>
+    Score:<br><span id="score" style="color:yellow;font-size:30px;">0</span>
+</div>
+</td>
+
+<td height="200">
+<div id="gameArea"></div>
+</td>
+</tr>
+
+<tr>
+<td style="width:80%">
+<div id="raceTrack">
+ <img src="https://i.imgur.com/VS8OTNA.jpeg" id="church">
+    <img src="https://i.imgur.com/PcDEn6L.gif" id="nun">
+   
+</div>
+<div id="message" style="font-size:50px;position:absolute; left:550px; top:450px;"></div>
+<div id="message2" style="font-size:100px;position:absolute; text-align:center; vertical-align:middle; left:250px; top:200px;color:yellow; display:flex;
+        align-items:center;
+        justify-content:center;"></div>
+</td>
+</tr>
+</table>
+
+<script>
+//jodhee
+let timeLeft = 0;
+let timer;
+let score = 0;
+let nunPosition = 0;
+const step = 50;
+let targetType = "even"; // even or odd
+
+function startGame() {
+    timeLeft = parseInt(document.getElementById("timeInput").value);
+    score = 0;
+    nunPosition = 0;
+document.getElementById("nun").style.left = "0px";
+    document.getElementById("score").textContent = score;
+    document.getElementById("time").textContent = timeLeft;
+    document.getElementById("message").textContent = "";
+document.getElementById("message2").textContent ="";
+document.getElementById("message2").style.width = "0px";
+document.getElementById("message2").style.height = "0px";
+document.getElementById("message2").style.border = "none";
+
+
+    generateNumbers();
+
+    clearInterval(timer);
+    timer = setInterval(() => {
+        timeLeft--;
+        document.getElementById("time").textContent = timeLeft;
+        if (timeLeft <= 0) {
+            clearInterval(timer);
+            endGame();
+        }
+    }, 1000);
+}
+
+function generateNumbers() {
+    const gameArea = document.getElementById("gameArea");
+    gameArea.innerHTML = "";
+
+    targetType = Math.random() < 0.5 ? "even" : "odd";
+
+    const instruction = document.createElement("div");
+    instruction.style.fontSize = "40px";
+    instruction.style.fontWeight = "bold";
+    instruction.style.color = "black";
+    instruction.textContent = targetType === "even"
+        ? "Click all the EVEN numbers"
+        : "Click all the ODD numbers";
+    gameArea.appendChild(instruction);
+
+    let numbers = [];
+    for (let i = 0; i < 4; i++) {
+        numbers.push(Math.floor(Math.random() * 90) + 1);
+    }
+
+    numbers.forEach(num => {
+        const div = document.createElement("div");
+        div.textContent = num;
+        div.style.fontSize = "100px";
+        div.style.borderRadius = "20%";
+        div.style.border = "5px solid blue";
+        div.style.boxShadow = "3px 3px black";
+        div.style.width = "150px";
+        div.style.height = "90px";
+        div.className = "number";
+        div.onclick = () => div.classList.toggle("selected");
+        gameArea.appendChild(div);
+    });
+
+    const submit = document.createElement("button");
+    submit.textContent = "Submit Answer";
+    submit.style.fontSize = "40px";
+    submit.onclick = checkAnswer;
+    gameArea.appendChild(document.createElement("br"));
+    gameArea.appendChild(submit);
+}
+
+function checkAnswer() {
+    const allNumbers = document.querySelectorAll(".number");
+    const good = document.getElementById("voice1");
+    const bad = document.getElementById("voice2");
+
+    let correct = true;
+
+    allNumbers.forEach(num => {
+        const value = parseInt(num.textContent);
+        const isEven = value % 2 === 0;
+        const selected = num.classList.contains("selected");
+
+        if (targetType === "even") {
+            if (isEven && !selected) correct = false;
+            if (!isEven && selected) correct = false;
+        } else {
+            if (!isEven && !selected) correct = false;
+            if (isEven && selected) correct = false;
+        }
+    });
+
+    if (correct) {
+        score++;
+        nunPosition += step;
+        document.getElementById("message").textContent = "Good job!";
+        document.getElementById("message").style.color = "yellow";
+        good.play();
+    } else {
+        nunPosition = Math.max(0, nunPosition - step);
+        document.getElementById("message").textContent = "Try again!";
+        document.getElementById("message").style.color = "red";
+        bad.play();
+    }
+
+    document.getElementById("score").textContent = score;
+    document.getElementById("nun").style.left = nunPosition + "px";
+
+    checkWin();
+    generateNumbers();
+}
+
+function checkWin() {
+    const trackWidth = document.getElementById("raceTrack").offsetWidth;
+    const churchWidth = document.getElementById("church").offsetWidth;
+    const win = document.getElementById("voice3");
+
+    if (nunPosition >= trackWidth - churchWidth - 10) {
+        clearInterval(timer);
+        document.getElementById("message2").textContent = "Congratulations, Assumptionist!!";
+        win.play();
+document.getElementById("message2").style.color = "red";
+    document.getElementById("message2").style.fontFamily = "cooper";
+
+    document.getElementById("message2").style.textShadow = "2px 2px black";
+
+document.getElementById("message2").style.backgroundImage = "url(conf.gif)";
+document.getElementById("message2").style.backgroundSize = "100% 100%";
+document.getElementById("message2").style.borderRadius = "20%";
+document.getElementById("message2").style.width = "900px";
+document.getElementById("message2").style.height = "300px";
+
+    }
+}
+
+function endGame() {
+    const lose = document.getElementById("voice4");
+    document.getElementById("message2").textContent = "Oops! Time's up. Try again!";
+    lose.play();
+document.getElementById("message2").style.width = "900px";
+document.getElementById("message2").style.height = "300px";
+document.getElementById("message2").style.backgroundColor = "Cyan";
+document.getElementById("message2").style.border = "10px solid red";
+document.getElementById("message2").style.fontSize = "60px";
+document.getElementById("message2").style.fontFamily = "cooper";
+document.getElementById("message2").style.borderRadius = "20%";
+document.getElementById("message2").style.boxShadow = "5px 5px black";
+
+        document.getElementById("message2").style.color = "purple";
+
+}
+</script>
+
+</body>
+</html>
